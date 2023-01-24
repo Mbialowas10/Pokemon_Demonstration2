@@ -12,16 +12,18 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.PokemonViewHolder>{
 
     private ArrayList<String> pokemonNameList;
     private ArrayList<String> pokemonDetailsList;
-    private ArrayList<Integer> imageList;
+    private ArrayList<String> imageList;
     private Context context;
 
-    public RecyclerAdapter(ArrayList<String> pokemonNameList, ArrayList<String> pokemonDetailsList, ArrayList<Integer> imageList, Context context) {
+    public RecyclerAdapter(ArrayList<String> pokemonNameList, ArrayList<String> pokemonDetailsList, ArrayList<String> imageList, Context context) {
         this.pokemonNameList = pokemonNameList;
         this.pokemonDetailsList = pokemonDetailsList;
         this.imageList = imageList;
@@ -39,7 +41,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Pokemo
     public void onBindViewHolder(@NonNull PokemonViewHolder holder, int position) {
         holder.text_name.setText(pokemonNameList.get(position));
         holder.text_details.setText(pokemonDetailsList.get(position));
-        holder.image_view.setImageResource(imageList.get(position));
+
+        Glide.with(context)
+                .load(imageList.get(position))
+                .into(holder.image_view);
 
         holder.card_view.setOnClickListener(new View.OnClickListener() {
             @Override
