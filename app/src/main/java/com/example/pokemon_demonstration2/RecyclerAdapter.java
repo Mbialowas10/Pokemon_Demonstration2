@@ -23,7 +23,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Pokemo
     private ArrayList<String> imageList;
     private Context context;
 
-    public RecyclerAdapter(ArrayList<String> pokemonNameList, ArrayList<String> pokemonDetailsList, ArrayList<String> imageList, Context context) {
+    public RecyclerAdapter(ArrayList<String> pokemonNameList, ArrayList<String> imageList, Context context) {
         this.pokemonNameList = pokemonNameList;
         this.pokemonDetailsList = pokemonDetailsList;
         this.imageList = imageList;
@@ -40,7 +40,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Pokemo
     @Override
     public void onBindViewHolder(@NonNull PokemonViewHolder holder, int position) {
         holder.text_name.setText(pokemonNameList.get(position));
-        holder.text_details.setText(pokemonDetailsList.get(position));
+        //holder.text_details.setText(pokemonDetailsList.get(position));
 
         Glide.with(context)
                 .load(imageList.get(position))
