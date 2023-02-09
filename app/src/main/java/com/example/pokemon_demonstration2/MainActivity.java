@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     // 1. CREATE JSON URL
     //private static String JSON_URL = "https://run.mocky.io/v3/1600974f-18ef-4ded-9058-32c118fff9c5";
-    private String url = "https://pokeapi.co/api/v2/pokemon/";
+    private String url = "https://pokeapi.co/api/v2/pokemon?limit=1000&offset=1";
 
     //data members
     private RecyclerView recycler_view;
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         adapter = new RecyclerAdapter(pokemonNameList,imageList, MainActivity.this);
         recycler_view.setAdapter(adapter);
     }
+    /*
     public String[] fetchImage(String url){
         //final String[] str_image = {""};
         final String[] str_img = {""};
@@ -91,15 +93,18 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+    */
     public void getData(){
-        //GetData getData = new GetData();
-        //getData.execute();
+
+
         RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
         // Request a string response from the provided URL.
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                String pokemon_name;
+                String qualified_url;
+
+                final String[] pokemon_name = new String[1];
                 String pokemon_url;
                 String image[];
 
@@ -112,18 +117,29 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
                     Log.i("API", "Response is this => " + response.toString());
+                    int pokemon_count = Integer.parseInt(response.getString("count"));
+                    //Log.i("count", String.valueOf(pokemon_count));
+
+                    for (int idx=1; idx < pokemon_count; idx++){
+                        qualified_url = "https://pokeapi.co/api/v2/pokemon/" + idx + "/";
+                        Log.i("qualified_url", qualified_url);
+
+
+
+                    }
+
                     jsonArray = response.getJSONArray("results");
 
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject pokemonObjs = jsonArray.getJSONObject(i);
 
-                        pokemon_name = pokemonObjs.getString("name");
+                        pokemon_name[0] = pokemonObjs.getString("name");
                         pokemon_url = pokemonObjs.getString("url");
-                        Log.i("Objects", pokemon_name);
-                        Log.i("Objects", pokemon_url);
-                        image = fetchImage(pokemon_url);
+                        //Log.i("Objects", pokemon_name);
+                        //Log.i("Objects", pokemon_url);
+                        //image = fetchImage(pokemon_url);
 
-                        Log.i("LoggingInside", image[0]);
+                        //Log.i("LoggingInside", image[0]);
 
 
 
