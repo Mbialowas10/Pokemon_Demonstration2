@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(Void... voids) {
-            String json_url = "https://pokeapi.co/api/v2/pokemon?limit=250&offset=0";
+            String json_url = "https://pokeapi.co/api/v2/pokemon?limit=100&offset=0";
             String results = fetchDataByURL(json_url);
 
             try {
