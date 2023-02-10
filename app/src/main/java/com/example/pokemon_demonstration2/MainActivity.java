@@ -7,8 +7,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.PrecomputedText;
 import android.util.Log;
+import android.widget.ProgressBar;
 
 
 import com.android.volley.Request;
@@ -25,18 +29,25 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
-
-
+import javax.net.ssl.HttpsURLConnection;
+import javax.xml.transform.Result;
 
 
 public class MainActivity extends AppCompatActivity {
 
     // 1. CREATE JSON URL
     //private static String JSON_URL = "https://run.mocky.io/v3/1600974f-18ef-4ded-9058-32c118fff9c5";
-    private String url = "https://pokeapi.co/api/v2/pokemon?limit=1000&offset=1";
-
+    //private String json_url = "https://pokeapi.co/api/v2/pokemon?limit=1000&offset=1";
+    //private String json_url = "https://pokeapi.co/api/v2/pokemon";
     //data members
     private RecyclerView recycler_view;
     private ArrayList<String> pokemonNameList = new ArrayList<>();
@@ -53,180 +64,101 @@ public class MainActivity extends AppCompatActivity {
         recycler_view.setLayoutManager(new LinearLayoutManager(this));
 
         //fetch data
-        getData();
+        new backgroundTask().execute();
 
         // todo - implement the adapter
-        adapter = new RecyclerAdapter(pokemonNameList,imageList, MainActivity.this);
-        recycler_view.setAdapter(adapter);
-    }
-    /*
-    public String[] fetchImage(String url){
-        //final String[] str_image = {""};
-        final String[] str_img = {""};
-
-        RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(GET, url,null, new Response.Listener<JSONObject>() {
-           @Override
-           public void onResponse(JSONObject response) {
-               //Log.i("Image", response.toString());
-               try {
-                   JSONObject pokemonDetails = response.getJSONObject("sprites");
-                   //Log.i("PokemonDetails", pokemonDetails.getString("back_default"));
-                   //str_image[0] = pokemonDetails.getString("back_default");
-                   str_img[0] = pokemonDetails.getString("back_default");
-                   Log.i("Logging", str_img[0]);
-
-               } catch (JSONException e) {
-                   e.printStackTrace();
-               }
-
-           }
-       }, new Response.ErrorListener() {
-           @Override
-           public void onErrorResponse(VolleyError error) {
-               Log.i("API", "That didn't work!");
-           }
-       });
-        queue.add(jsonObjectRequest);
-        return str_img;
-
-
-
-    }
-    */
-    public void getData(){
-
-
-        RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
-        // Request a string response from the provided URL.
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(GET, url, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                String qualified_url;
-
-                final String[] pokemon_name = new String[1];
-                String pokemon_url;
-                String image[];
-
-                ArrayList<String> result = null;
-
-                final String[] sprite = new String[1];
-
-                final JSONArray jsonArray;
-                final JSONArray[] pokemonDetailsArray = {null};
-
-                try {
-                    Log.i("API", "Response is this => " + response.toString());
-                    int pokemon_count = Integer.parseInt(response.getString("count"));
-                    //Log.i("count", String.valueOf(pokemon_count));
-
-                    for (int idx=1; idx < pokemon_count; idx++){
-                        qualified_url = "https://pokeapi.co/api/v2/pokemon/" + idx + "/";
-                        Log.i("qualified_url", qualified_url);
-
-
-
-                    }
-
-                    jsonArray = response.getJSONArray("results");
-
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject pokemonObjs = jsonArray.getJSONObject(i);
-
-                        pokemon_name[0] = pokemonObjs.getString("name");
-                        pokemon_url = pokemonObjs.getString("url");
-                        //Log.i("Objects", pokemon_name);
-                        //Log.i("Objects", pokemon_url);
-                        //image = fetchImage(pokemon_url);
-
-                        //Log.i("LoggingInside", image[0]);
-
-
-
-                    }
-                    //pokemonNameList.add(jsonObject1.getString("name"));
-                    //pokemonDetailsList.add(jsonObject1.getString("details"));
-                    //imageList.add(jsonObject1.getString("image"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.i("API", "That didn't work!");
-            }
-
-        });
-        queue.add(jsonObjectRequest);
+        //adapter = new RecyclerAdapter(pokemonNameList,imageList, MainActivity.this);
+        //recycler_view.setAdapter(adapter);
     }
 
+    public class backgroundTask extends AsyncTask<Void,Void,String> {
 
-/*
-    public class GetData extends AsyncTask<String, String, String> {
+        ProgressDialog pd;
+        String pokemon_name, pokemon_url;
+        JSONObject pokemon = null;
 
-        @Override
-        protected String doInBackground(String... strings) {
-            String current = "";
-            URL url;
-            HttpURLConnection urlConnection = null;
 
+        protected  String fetchDataByURL(String json_url ){
+            StringBuilder builder = null;
             try {
-                try {
-                    url = new URL(JSON_URL);
-                    urlConnection = (HttpURLConnection) url.openConnection();
-
-                    InputStream is = urlConnection.getInputStream();
-                    InputStreamReader isr = new InputStreamReader(is);
-
-                    int data = isr.read();
-                    while (data != -1) {
-                        current += (char) data;
-                        data = isr.read();
-                    }
-
-                    return current;
-
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (urlConnection != null) {
-                        urlConnection.disconnect();
-                    }
+                URL url = new URL(json_url);
+                HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+                InputStreamReader reader = new InputStreamReader(con.getInputStream());
+                BufferedReader bufferedReader = new BufferedReader(reader);
+                String line = "";
+                builder = new StringBuilder();
+                while ((line = bufferedReader.readLine()) != null) {
+                    builder.append(line);
                 }
-            } catch (Exception e)   {
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
                 e.printStackTrace();
             }
-            return current;
+            //Log.e("MJB", builder.toString());
+
+            return builder.toString();
         }
 
         @Override
-        protected void onPostExecute(String s) {
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd = new ProgressDialog(MainActivity.this);
+            pd.setTitle("Please wait...");
+            pd.setMessage("JSON File Downloading...");
+            pd.show();
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            String json_url = "https://pokeapi.co/api/v2/pokemon?limit=250&offset=0";
+            String results = fetchDataByURL(json_url);
+
             try {
-                JSONObject jsonObject = new JSONObject(s);
-                JSONArray jsonArray = jsonObject.getJSONArray("pokemons");
+                pokemon = new JSONObject(results);
+                int count = Integer.parseInt(pokemon.getString("count"));
+                JSONArray pokemon_array = new JSONArray(pokemon.getString("results"));
 
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject jsonObject1 = jsonArray.getJSONObject(i);
 
-                    pokemonNameList.add(jsonObject1.getString("name"));
-                    pokemonDetailsList.add(jsonObject1.getString("details"));
-                    imageList.add(jsonObject1.getString("image"));
+
+                for (int i=0; i< pokemon_array.length();i++){
+                    JSONObject obj = pokemon_array.getJSONObject(i);
+                    pokemon_name = obj.getString("name");
+                    pokemon_url = obj.getString("url");
+                    Log.i("Pokemon Name", pokemon_name);
+                    Log.i("Pokemon URL", pokemon_url);
+
+                    results =  fetchDataByURL(pokemon_url);
+                    //Log.i("results", results);
+
+                    JSONObject obj_details = new JSONObject(results); //main details page
+                    String sprites = obj_details.getString("sprites");
+                    JSONObject sprites_obj = new JSONObject(sprites);
+                    String back_default = sprites_obj.getString("back_default");
+                    //Log.i("Sprites",back_default);
+
+                    pokemonNameList.add(pokemon_name);
+                    imageList.add(back_default);
+                    adapter = new RecyclerAdapter(pokemonNameList, imageList, MainActivity.this);
+                    //recycler_view.setAdapter(adapter);
                 }
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            adapter = new RecyclerAdapter(pokemonNameList, pokemonDetailsList, imageList, MainActivity.this);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            pd.dismiss();
+           //Log.i("mjb",s);
+            String results;
+
+            //adapter = new RecyclerAdapter(pokemonNameList, pokemonDetailsList, imageList, MainActivity.this);
             recycler_view.setAdapter(adapter);
         }
     }
-*/
 
-
-}
+} // end MainActivity
