@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "145667768763",
+    "project_id": "pokedex-df29d",
+    "storage_bucket": "pokedex-df29d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:145667768763:android:66ef6a6bb867aace0fc49e",
+        "android_client_info": {
+          "package_name": "com.example.pokemon_demonstration2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "145667768763-57661m5dfus2thpsm70iqmsigg9mgur5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArzP_VKXdCasBYbYiwAd3Gm1TAGcEnHyU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "145667768763-57661m5dfus2thpsm70iqmsigg9mgur5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
