@@ -8,6 +8,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +27,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Pokemo
     private ArrayList<String> pokemonDetailsList;
     private ArrayList<String> imageList;
     private Context context;
+    private Button sign_out;
 
     public RecyclerAdapter(ArrayList<String> pokemonNameList, ArrayList<String> imageList, Context context) {
         this.pokemonNameList = pokemonNameList;
@@ -64,6 +66,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Pokemo
 
             }
         });
+
 
     }
 

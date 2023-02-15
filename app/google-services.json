@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "145667768763-6j1vq5rm5oa9a3pbuq8gmjkbg16jej6p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pokemon_demonstration2",
+            "certificate_hash": "cd145647cf8a4f4b55cbd524e2793d4300559bea"
+          }
+        },
+        {
           "client_id": "145667768763-57661m5dfus2thpsm70iqmsigg9mgur5.apps.googleusercontent.com",
           "client_type": 3
         }

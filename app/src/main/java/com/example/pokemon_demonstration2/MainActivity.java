@@ -8,11 +8,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.PrecomputedText;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 
 import com.android.volley.Request;
@@ -22,6 +26,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.auth.FirebaseAuth;
 
 
 import org.json.JSONArray;
@@ -54,14 +59,35 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> pokemonDetailsList = new ArrayList<>();
     private ArrayList<String> imageList    = new ArrayList<>();
     private RecyclerAdapter adapter;
+    private Button sign_out;
+    private FirebaseAuth auth;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
         recycler_view = findViewById(R.id.recycler_view);
         recycler_view.setLayoutManager(new LinearLayoutManager(this));
+
+        // sign out button
+        sign_out = findViewById(R.id.btn_signout);
+
+        sign_out.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //auth = FirebaseAuth.getInstance();
+                //auth.signOut();
+                FirebaseAuth.getInstance().signOut();
+                Toast.makeText(MainActivity.this, "User has signed out", Toast.LENGTH_LONG).show();
+                Intent i = new Intent(MainActivity.this, LogIn.class);
+                startActivity(i);
+                finish();
+            }
+        });
 
         //fetch data
         new backgroundTask().execute();
