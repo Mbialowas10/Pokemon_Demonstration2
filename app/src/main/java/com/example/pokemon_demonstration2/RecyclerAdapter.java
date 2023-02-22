@@ -18,6 +18,10 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -28,12 +32,22 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Pokemo
     private ArrayList<String> imageList;
     private Context context;
     private Button sign_out;
+    private FirebaseAuth auth;
+    private FirebaseDatabase db;
+    private DatabaseReference db_ref;
+
+
+
 
     public RecyclerAdapter(ArrayList<String> pokemonNameList, ArrayList<String> imageList, Context context) {
         this.pokemonNameList = pokemonNameList;
         this.pokemonDetailsList = pokemonDetailsList;
         this.imageList = imageList;
         this.context = context;
+
+        this.auth = FirebaseAuth.getInstance();
+        this.db = FirebaseDatabase.getInstance();
+        this.db_ref = db.getReference("like");
     }
 
     @NonNull
@@ -66,7 +80,23 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Pokemo
 
             }
         });
+        holder.btn_like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseUser currentUser = auth.getCurrentUser();
 
+
+                if (currentUser != null ) {
+                    Toast.makeText(view.getContext(), "Liked  " + pokemonNameList.get(position) + " by " + currentUser.getEmail(),Toast.LENGTH_LONG).show();
+                    //Toast.makeText(view.getContext(), "By  " + currentUser, Toast.LENGTH_LONG).show();
+
+                    db_ref.setValue(currentUser.getEmail());
+                    db_ref.setValue(pokemonNameList.get(position));
+                }
+
+                //Log.i("UserMB", String.valueOf(currentUser));
+            }
+        });
 
     }
 
@@ -79,6 +109,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Pokemo
         private TextView text_name,text_details;
         private ImageView image_view;
         private CardView card_view;
+        private Button btn_like;
 
 
         public PokemonViewHolder(@NonNull View itemView) {
@@ -88,7 +119,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Pokemo
             text_details = itemView.findViewById(R.id.text_details);
             image_view = itemView.findViewById(R.id.image_view);
             card_view  = itemView.findViewById(R.id.card_view);
-
+            btn_like = itemView.findViewById(R.id.btn_like);
         }
     }
 
