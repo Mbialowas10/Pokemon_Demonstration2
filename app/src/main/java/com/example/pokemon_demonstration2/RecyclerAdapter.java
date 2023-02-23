@@ -3,8 +3,6 @@ package com.example.pokemon_demonstration2;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,20 +12,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.PokemonViewHolder>{
 
@@ -66,7 +63,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Pokemo
     public void onBindViewHolder(@NonNull PokemonViewHolder holder, @SuppressLint("RecyclerView") int position) {
         holder.text_name.setText(pokemonNameList.get(position));
         //holder.text_details.setText(pokemonDetailsList.get(position));
-
+        holder.btn_remove.setVisibility(View.INVISIBLE);
 
         Glide.with(context)
                 .load(imageList.get(position))
@@ -103,8 +100,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Pokemo
 
                     db_ref.child("user").push().setValue(currentUser.getEmail());
                     db_ref.child("user").push().setValue(list);
-
-
+                    //DatabaseReference pokemonRef = db_ref.child("user").push().setValue(list);
+                    holder.btn_like.setVisibility(View.INVISIBLE);
+                    holder.btn_remove.setVisibility(View.VISIBLE);
 
                     //db_ref.setValue(list);
                     //db_ref.updateChildren(list);
@@ -115,6 +113,28 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Pokemo
             }
 
         });
+
+        holder.btn_remove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String pushId = db_ref.getKey();
+                DatabaseReference childRef = db_ref.child(pushId);
+                childRef.removeValue(new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                        if (error != null ){
+                            Toast.makeText(view.getContext(), "Something wrong vlaue could not be removed", Toast.LENGTH_LONG);
+                        }else{
+                            // data removed
+                            Toast.makeText(view.getContext(),"Data removed from database", Toast.LENGTH_LONG);
+                            holder.btn_remove.setVisibility(View.INVISIBLE);
+                            holder.btn_like.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+            }
+        });
+
 
     }
 
@@ -127,7 +147,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Pokemo
         private TextView text_name,text_details;
         private ImageView image_view;
         private CardView card_view;
-        private Button btn_like;
+        private Button btn_like, btn_remove;
 
 
         public PokemonViewHolder(@NonNull View itemView) {
@@ -138,6 +158,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Pokemo
             image_view = itemView.findViewById(R.id.image_view);
             card_view  = itemView.findViewById(R.id.card_view);
             btn_like = itemView.findViewById(R.id.btn_like);
+            btn_remove = itemView.findViewById(R.id.btn_remove);
         }
     }
 
