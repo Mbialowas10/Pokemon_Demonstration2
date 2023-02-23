@@ -24,6 +24,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.PokemonViewHolder>{
 
@@ -47,7 +51,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Pokemo
 
         this.auth = FirebaseAuth.getInstance();
         this.db = FirebaseDatabase.getInstance();
-        this.db_ref = db.getReference("like");
+        this.db_ref = db.getReference("likes");
     }
 
     @NonNull
@@ -90,12 +94,26 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Pokemo
                     Toast.makeText(view.getContext(), "Liked  " + pokemonNameList.get(position) + " by " + currentUser.getEmail(),Toast.LENGTH_LONG).show();
                     //Toast.makeText(view.getContext(), "By  " + currentUser, Toast.LENGTH_LONG).show();
 
-                    db_ref.setValue(currentUser.getEmail());
-                    db_ref.setValue(pokemonNameList.get(position));
+                    //String key = db_ref.child(currentUser.getEmail()).push().getKey();
+                    //Map<String, String> list = new HashMap<>();
+                    //list.put("userEmail",currentUser.getEmail());
+                    //list.put(key, pokemonNameList.get(position) );
+                    List<String> list = new ArrayList<>();
+                    list.add(pokemonNameList.get(position));
+
+                    db_ref.child("user").push().setValue(currentUser.getEmail());
+                    db_ref.child("user").push().setValue(list);
+
+
+
+                    //db_ref.setValue(list);
+                    //db_ref.updateChildren(list);
+
                 }
 
                 //Log.i("UserMB", String.valueOf(currentUser));
             }
+
         });
 
     }
